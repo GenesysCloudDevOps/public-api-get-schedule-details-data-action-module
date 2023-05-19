@@ -1,0 +1,74 @@
+{
+  "name": "Get Schedule Details",
+  "integrationType": "purecloud-data-actions",
+  "actionType": "custom",
+  "config": {
+    "request": {
+      "requestUrlTemplate": "/api/v2/architect/schedules?name=$esc.url(${input.searchAttribute})",
+      "requestType": "GET",
+      "headers": {
+        "UserAgent": "PureCloudIntegrations/1.0",
+        "Content-Type": "application/json"
+      },
+      "requestTemplate": "${input.rawRequest}"
+    },
+    "response": {
+      "translationMap": {
+        "ScheduleEnd": "$.entities[?(@.id != '')].end",
+        "RRule": "$.entities[?(@.id != '')].rrule",
+        "ScheduleStart": "$.entities[?(@.id != '')].start",
+        "State": "$.entities[?(@.id != '')].state"
+      },
+      "translationMapDefaults": {},
+      "successTemplate": "{\"ScheduleStart\": ${successTemplateUtils.firstFromArray(${ScheduleStart})}, \"ScheduleEnd\": ${successTemplateUtils.firstFromArray(${ScheduleEnd})}, \"State\": ${successTemplateUtils.firstFromArray(${State})}, \"RRule\": ${successTemplateUtils.firstFromArray(${RRule})}}"
+    }
+  },
+  "contract": {
+    "input": {
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "required": [
+          "searchAttribute"
+        ],
+        "properties": {
+          "searchAttribute": {
+            "description": "The name of the Schedule matching exactly or with a wildcard * character",
+            "type": "string",
+            "title": "Schedule Name"
+          }
+        }
+      }
+    },
+    "output": {
+      "successSchema": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "title": "Open and Closed Times",
+        "type": "object",
+        "properties": {
+          "ScheduleEnd": {
+            "description": "",
+            "type": "string",
+            "title": "End"
+          },
+          "RRule": {
+            "description": "",
+            "type": "string",
+            "title": "Rrule"
+          },
+          "State": {
+            "description": "",
+            "type": "string",
+            "title": "State"
+          },
+          "ScheduleStart": {
+            "description": "",
+            "type": "string",
+            "title": "Start"
+          }
+        }
+      }
+    }
+  },
+  "secure": false
+}
